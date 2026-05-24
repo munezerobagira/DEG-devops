@@ -1,0 +1,56 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {},
+      "targets": [
+        { "expr": "avg_over_time(probe_success{instance=\"http://order-service:3001/health\"}[24h]) * 100", "refId": "A" }
+      ],
+      "title": "Order Service Uptime %",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+      "id": 2,
+      "options": {},
+      "targets": [
+        { "expr": "avg_over_time(probe_success{instance=\"http://tracking-service:3002/health\"}[24h]) * 100", "refId": "A" }
+      ],
+      "title": "Tracking Service Uptime %",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+      "id": 3,
+      "options": {},
+      "targets": [
+        { "expr": "avg_over_time(probe_success{instance=\"http://notification-service:3003/health\"}[24h]) * 100", "refId": "A" }
+      ],
+      "title": "Notification Service Uptime %",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 30,
+  "style": "dark",
+  "tags": ["watchtower"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "WatchTower Overview",
+  "uid": "watchtower-overview"
+}
