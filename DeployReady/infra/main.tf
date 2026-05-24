@@ -1,16 +1,16 @@
 # Configure the Azure provider
 terraform {
-   required_providers {
+  required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "~> 4.1.0"
     }
     tls = {
-      source = "hashicorp/tls"
+      source  = "hashicorp/tls"
       version = "~> 4.0"
     }
     local = {
-      source = "hashicorp/local"
+      source  = "hashicorp/local"
       version = "~> 2.0"
     }
   }
@@ -27,7 +27,7 @@ provider "azurerm" {
 provider "tls" {}
 provider "local" {}
 
- # Resource Group
+# Resource Group
 resource "azurerm_resource_group" "rg" {
   name     = "app-deployment-rg"
   location = "southafricanorth"
@@ -109,11 +109,11 @@ resource "azurerm_network_interface_security_group_association" "nic_nsg" {
 
 #  Virtual Machine 
 resource "azurerm_linux_virtual_machine" "vm" {
-  name                = "app-server"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  size                = "Standard_B2ats_v2"
-  admin_username      = var.admin_username
+  name                            = "app-server"
+  resource_group_name             = azurerm_resource_group.rg.name
+  location                        = azurerm_resource_group.rg.location
+  size                            = "Standard_B2ats_v2"
+  admin_username                  = var.admin_username
   disable_password_authentication = true
 
   admin_ssh_key {
@@ -156,8 +156,8 @@ resource "tls_private_key" "deploy_key" {
 }
 
 resource "local_file" "private_key_file" {
-  content  = tls_private_key.deploy_key.private_key_pem
-  filename = "${path.module}/ssh_private_key.pem"
+  content         = tls_private_key.deploy_key.private_key_pem
+  filename        = "${path.module}/ssh_private_key.pem"
   file_permission = "0600"
 }
 

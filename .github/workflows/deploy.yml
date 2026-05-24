@@ -3,6 +3,8 @@ name: CI Build and Deploy
 on:
   push:
     branches: [main]
+    paths:
+      - "DeployReady/**"
 
 jobs:
   build-and-deploy:
