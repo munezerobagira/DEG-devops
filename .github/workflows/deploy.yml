@@ -1,0 +1,56 @@
+name: CI Build and Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install and run tests
+        run: |
+          cd DeployReady/app
+          npm install
+          npm test
+
+      # Log in to GitHub Container Registry so we can push images
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build the Docker image and push it to GHCR tagged with the commit SHA
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./DeployReady
+          file: ./DeployReady/Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/deployready:${{ github.sha }}
+
+      # Deploy the new image to a remote VM via SSH
+      - name: Deploy to remote server via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            # Pull the newly pushed image
+            docker pull ghcr.io/${{ github.repository_owner }}/deployready:${{ github.sha }}
+            # Stop and remove any existing container
+            docker stop deployready || true
+            docker rm deployready || true
+            # Run the container (expects an env file at /home/$USER/deployready.env)
+            docker run -d --restart unless-stopped -p 80:3000 --env-file /home/${{ secrets.SSH_USERNAME }}/deployready.env --name deployready ghcr.io/${{ github.repository_owner }}/deployready:${{ github.sha }}
