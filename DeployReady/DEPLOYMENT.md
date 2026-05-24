@@ -24,9 +24,9 @@ The VM uses the `Standard_B1s` size and the current Terraform configuration enab
 
 ## Required Terraform Inputs
 
-The deployment is controlled through `DeployReady/infra/terraform.tfvars`.
+The deployment requires environment variables which can be referenced from example values in `DeployReady/infra/example.tfvars`.
 
-Required values:
+Required values are:
 
 - `subscription_id`: Azure subscription ID
 - `my_ip`: public IP address used to restrict SSH access
@@ -57,7 +57,7 @@ terraform output public_ip
 terraform output admin_username
 ```
 
-Use the private key to connect to the VM:
+and you can use the private key to connect to the VM:
 
 ```bash
 ssh -i infra/ssh_private_key.pem <admin_username>@<public_ip>
@@ -81,18 +81,6 @@ The image tag format is:
 ghcr.io/<github-owner>/deployready:<commit-sha>
 ```
 
-Example container commands on the VM:
-
-```bash
-docker pull ghcr.io/<github-owner>/deployready:<commit-sha>
-docker stop deployready || true
-docker rm deployready || true
-docker run -d --restart unless-stopped -p 80:3000 \
-  --env-file /home/<ssh-username>/deployready.env \
-  --name deployready \
-  ghcr.io/<github-owner>/deployready:<commit-sha>
-```
-
 ## GitHub Actions
 
 The workflow in [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) performs the following steps:
@@ -106,7 +94,8 @@ The workflow in [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml
 The SSH key is stored as a GitHub secret. The secret must contain the private key that matches the public key configured on the VM.
 
 ## Verification
- Confirm the service is running with:
+
+Confirm the service is running with:
 
 ```bash
 curl http://<public-ip>/health
